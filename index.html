@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Notas</title>
+    <style>
+      :root {
+        --color-primary: #1a73e8;
+        --color-primary-dark: #1557b0;
+        --color-secondary: #5f6368;
+        --color-bg: #f8f9fa;
+        --color-card: #ffffff;
+        --color-text: #202124;
+        --color-border: #e0e0e0;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: var(--color-text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 16px;
+      }
+
+      .card {
+        background-color: var(--color-card);
+        width: 100%;
+        max-width: 420px;
+        padding: 28px 24px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .materia-tag {
+        display: inline-block;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--color-primary);
+        background-color: #e8f0fe;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 8px;
+      }
+
+      .titulo-principal {
+        color: #1f2937;
+        font-size: 1.35rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 6px;
+      }
+
+      .badge-gestion {
+        display: inline-block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: #34a853;
+        padding: 2px 8px;
+        border-radius: 6px;
+        vertical-align: middle;
+      }
+
+      .campo {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #3c4043;
+      }
+
+      input[type="text"],
+      input[type="tel"] {
+        width: 100%;
+        height: 48px;
+        padding: 0 14px;
+        font-size: 1rem;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background-color: #fafafa;
+      }
+
+      input[type="text"]:focus,
+      input[type="tel"]:focus {
+        border-color: var(--color-primary);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+      }
+
+      button {
+        width: 100%;
+        height: 48px;
+        background-color: var(--color-primary);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+        margin-top: 8px;
+        box-shadow: 0 4px 6px rgba(26, 115, 232, 0.2);
+      }
+
+      button:hover {
+        background-color: var(--color-primary-dark);
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      #resultado {
+        margin-top: 20px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+      }
+
+      .exito {
+        background-color: #e6f4ea;
+        border: 1px solid #34a853;
+        color: #137333;
+        padding: 16px;
+        border-radius: 8px;
+      }
+
+      .exito h3 {
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+      }
+
+      .exito p {
+        margin-bottom: 4px;
+      }
+
+      .error {
+        background-color: #fce8e6;
+        border: 1px solid #ea4335;
+        color: #c5221f;
+        padding: 14px;
+        border-radius: 8px;
+      }
+
+      .cargando {
+        color: #5f6368;
+        font-style: italic;
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="materia-tag">💻 Computación</span>
+        <h1 class="titulo-principal">
+          Consulta de Notas<br>
+          <span style="font-size: 1.1rem; color: #4b5563;">2do Trimestre</span>
+          <span class="badge-gestion">2026</span>
+        </h1>
+      </div>
+
+      <div class="campo">
+        <label for="carnet">Número de carnet:</label>
+        <input type="tel" id="carnet" inputmode="numeric" placeholder="Ej: 15237388" required>
+      </div>
+
+      <div class="campo">
+        <label for="fecha">Fecha de nacimiento:</label>
+        <input type="text" id="fecha" placeholder="Día/Mes/Año (Ej: 11/5/2013)" required>
+      </div>
+
+      <button onclick="procesarConsulta()">Consultar Notas</button>
+
+      <div id="resultado"></div>
+    </div>
+
+    <script>
+      // ⚠️ IMPORTANTE: reemplaza esta URL si vuelves a implementar el
+      // Apps Script y se genera un ID nuevo (Implementar > Administrar
+      // implementaciones > copiar la URL activa).
+      var APPS_SCRIPT_URL = "https://script.google.com/a/~/macros/s/AKfycbzUs1aS-MucYboyNDpYi74n5vozMS2R6LSJy1kDPxRC9gZyE3nVj1CYeTafKr-pveDZdA/exec";
+
+      var contadorCallbacks = 0;
+
+      function procesarConsulta() {
+        var carnet = document.getElementById("carnet").value;
+        var fecha = document.getElementById("fecha").value;
+        var contenedor = document.getElementById("resultado");
+
+        if (!carnet || !fecha) {
+          contenedor.className = "error";
+          contenedor.innerHTML = "Por favor, complete ambos campos.";
+          return;
+        }
+
+        contenedor.className = "cargando";
+        contenedor.innerHTML = "Buscando información...";
+
+        consultarViaJSONP(carnet, fecha);
+      }
+
+      // Usamos JSONP (una etiqueta <script> dinámica) en vez de fetch().
+      // Esto evita por completo los bloqueos de CORS de Apps Script y,
+      // como nunca navegamos directamente a script.google.com, tampoco
+      // aparece la pantalla de "Denunciar abuso" ni el error de Drive
+      // por múltiples cuentas en el celular.
+      function consultarViaJSONP(carnet, fecha) {
+        var nombreCallback = "callback_" + (contadorCallbacks++);
+
+        window[nombreCallback] = function (res) {
+          mostrarResultado(res);
+          limpiar(nombreCallback, script);
+        };
+
+        var script = document.createElement("script");
+        var url = APPS_SCRIPT_URL +
+          "?callback=" + encodeURIComponent(nombreCallback) +
+          "&carnet=" + encodeURIComponent(carnet) +
+          "&fecha=" + encodeURIComponent(fecha);
+
+        script.src = url;
+        script.onerror = function () {
+          mostrarError({ message: "No se pudo conectar con el servidor. Revisa tu conexión a internet." });
+          limpiar(nombreCallback, script);
+        };
+
+        document.body.appendChild(script);
+
+        // Tiempo de espera de seguridad, por si el script nunca responde
+        setTimeout(function () {
+          if (window[nombreCallback]) {
+            mostrarError({ message: "La solicitud tardó demasiado. Inténtalo de nuevo." });
+            limpiar(nombreCallback, script);
+          }
+        }, 15000);
+      }
+
+      function limpiar(nombreCallback, scriptEl) {
+        delete window[nombreCallback];
+        if (scriptEl && scriptEl.parentNode) {
+          scriptEl.parentNode.removeChild(scriptEl);
+        }
+      }
+
+      function mostrarResultado(res) {
+        var contenedor = document.getElementById("resultado");
+        if (res.exito) {
+          contenedor.className = "exito";
+          contenedor.innerHTML =
+            "<h3>✅ Resultado Encontrado</h3>" +
+            "<p><b>Estudiante:</b> " + res.estudiante + "</p>" +
+            "<p><b>Curso:</b> " + res.curso + "</p>" +
+            "<p><b>Promedio Final:</b> " + res.promedio + "</p>";
+        } else {
+          contenedor.className = "error";
+          contenedor.innerHTML = "❌ " + res.mensaje;
+        }
+      }
+
+      function mostrarError(err) {
+        var contenedor = document.getElementById("resultado");
+        contenedor.className = "error";
+        contenedor.innerHTML = "Ocurrió un error en la solicitud: " + err.message;
+      }
+    </script>
+  </body>
+</html>
